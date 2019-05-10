@@ -13,7 +13,7 @@ app.listen(port, () => {
 
 
 app.get("/", (req, res, ) => {
-    res.sendFile('index.html')
+    res.render('index.html')
 })
 
 app.get("/contacts", (req, res) => {
