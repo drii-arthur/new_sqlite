@@ -9,7 +9,6 @@ function onFormSubmit() {
         else {
             let contact = myInput();
             updateRecord(contact)
-            resetForm()
         }
 
     } else {
@@ -18,13 +17,14 @@ function onFormSubmit() {
 
 }
 
-const base_url = "http://localhost:3000/contacts"
+const url = "http://localhost:3000/contacts"
+
 function view() {
 
-    fetch(base_url)
+    fetch(url)
         .then((res) => res.json())
         .then((data) => data.map(item => {
-            let tbody = document.getElementById("kolom-data");
+            let tbody = document.getElementById("table-row");
             let row = tbody.insertRow();
             let id = row.insertCell(0);
             let fullName = row.insertCell(1);
@@ -72,7 +72,7 @@ const newPost = post => {
             'Content-Type': 'application/json'
         })
     }
-    return fetch(base_url, option)
+    return fetch(url, option)
         .then((respons) => respons.json())
         .then((data))
         .catch((error) => console.error(`error: ${error}`))
@@ -146,7 +146,7 @@ function updateRecord(contact) {
             "Content-Type": "application/json"
         }
     }
-    fetch(`${base_url}/${selectedRow.cells[0].innerHTML}`, option)
+    fetch(`${url}/${selectedRow.cells[0].innerHTML}`, option)
         .then((respons) => respons.json())
         .then((data) => console.log(data))
         .catch((error) => console.error(`error: ${error}`))
@@ -158,17 +158,41 @@ const remove = (id) => {
     const options = {
         method: "DELETE",
     }
-    fetch(`${base_url}/${id}`, options)
+    fetch(`${url}/${id}`, options)
         .catch((error) => console.error(`error: ${error}`))
 
 }
-// function untuk mengosongkan form input
-function resetForm() {
-    document.getElementById("fullName").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("email").value = "";
-    document.getElementById("gender").value = ""
-}
+
+// function search
+
+document.getElementById('search').addEventListener('keyup', (e) => {
+    const inputValue = e.target.value;
+    fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+            let tbody = document.getElementById('table-row');
+            tbody.innerHTML = "";
+            data.map(item => {
+                if (item.fullName.toLowerCase().indexOf(inputValue) != -1) {
+                    let row = tbody.insertRow();
+                    let id = row.insertCell(0);
+                    let fullName = row.insertCell(1);
+                    let phoneNumber = row.insertCell(2);
+                    let email = row.insertCell(3);
+                    let gender = row.insertCell(4);
+                    let action = row.insertCell(5)
+
+                    id.innerHTML = item.id;
+                    fullName.innerHTML = item.fullName;
+                    phoneNumber.innerHTML = item.phoneNumber;
+                    email.innerHTML = item.email;
+                    gender.innerHTML = item.gender;
+                    action.innerHTML = `<a href="#" id="edit" onclick="onEdit(this)">Edit<i class='fas fa-pencil-alt'></i></a>
+                                    <a href="#" id="hapus"  onclick="remove(`+ item.id + `);document.location.reload(true)">Delete<i class='fas fa-user-times'></i></a>`
+                }
+            })
+        })
+})
 
 
 view()
